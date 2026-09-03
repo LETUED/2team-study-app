@@ -1,0 +1,25 @@
+name: PR 검사
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 저장소 수신
+        uses: actions/checkout@v4
+
+      - name: 파일 목록
+        run: git ls-files
+
+      - name: 민감 파일 검사
+        run: |
+          FOUND=$(git ls-files '*.properties' '*.env' '*.pem' '*.key' || true)
+          if [ -n "$FOUND" ]; then
+            echo "민감 파일이 발견되었습니다"
+            echo "$FOUND"
+            exit 1
+          fi
+          echo "민감 파일 없음"
